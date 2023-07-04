@@ -2,7 +2,7 @@ package buffer
 
 // RingGrowing is a growing ring buffer.
 // Not thread safe.
-type RingGrowing[T interface{}] struct {
+type RingGrowing[T any] struct {
 	data     []T
 	n        int // Size of Data
 	beg      int // First available element
@@ -10,7 +10,7 @@ type RingGrowing[T interface{}] struct {
 }
 
 // NewRingGrowing constructs a new RingGrowing instance with provided parameters.
-func NewRingGrowing[T interface{}](initialSize int) *RingGrowing[T] {
+func NewRingGrowing[T any](initialSize int) *RingGrowing[T] {
 	return &RingGrowing[T]{
 		data: make([]T, initialSize),
 		n:    initialSize,

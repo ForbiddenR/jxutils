@@ -32,7 +32,16 @@ func TestGrowth(t *testing.T) {
 	if g.readable != 0 {
 		t.Fatalf("expected readable to be zero: %d", g.readable)
 	}
-	ifg.n  != 16 {
+	if g.n != 16 {
 		t.Fatalf("expected N to be 16: %d", g.n)
+	}
+}
+
+func TestEmpty(t *testing.T) {
+	t.Parallel()
+	g := NewRingGrowing[int](1)
+	_, ok := g.ReadOne()
+	if ok != false {
+		t.Fatal("expected false")
 	}
 }
