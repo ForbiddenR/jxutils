@@ -2,28 +2,29 @@ package buffer
 
 // RingGrowing is a growing ring buffer.
 // Not thread safe.
-type RingGrowing struct {
-	data     []interface{}
+type RingGrowing[T interface{}] struct {
+	data     []T
 	n        int // Size of Data
 	beg      int // First available element
 	readable int // Number of data items available
 }
 
 // NewRingGrowing constructs a new RingGrowing instance with provided parameters.
-func NewRingGrowing(initialSize int) *RingGrowing {
-	return &RingGrowing{
-		data: make([]interface{}, initialSize),
+func NewRingGrowing[T interface{}](initialSize int) *RingGrowing[T] {
+	return &RingGrowing[T]{
+		data: make([]T, initialSize),
 		n:    initialSize,
 	}
 }
 
-func (r *RingGrowing) ReadOne() (data interface{}, ok bool) {
+func (r *RingGrowing[T]) ReadOne() (data T, ok bool) {
+	var empty T
 	if r.readable == 0 {
-		return nil, false
+		return empty, false
 	}
 	r.readable--
 	element := r.data[r.beg]
-	r.data[r.beg] = nil // Remove reference to the object to help GC
+	r.data[r.beg] = empty // Remove reference to the object to help GC
 	if r.beg == r.n-1 {
 		// Was the last element
 		r.beg = 0
@@ -33,11 +34,11 @@ func (r *RingGrowing) ReadOne() (data interface{}, ok bool) {
 	return element, true
 }
 
-func (r *RingGrowing) WriteOne(data interface{}) {
+func (r *RingGrowing[T]) WriteOne(data T) {
 	if r.readable == r.n {
 		// Time to grow
 		newN := r.n * 2
-		newData := make([]interface{}, newN)
+		newData := make([]T, newN)
 		to := r.beg + r.readable
 		if to <= r.n {
 			copy(newData, r.data[r.beg:to])
